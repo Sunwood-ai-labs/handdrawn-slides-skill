@@ -34,7 +34,7 @@ cd my-slides && python -m http.server 8000
 # http://localhost:8000/ を開く（← → で移動、F で全画面）
 ```
 
-Windows の PowerShell では、2 は `Copy-Item -Recurse $HOME\.claude\skills\handdrawn-slides	emplate my-slides` です。
+Windows の PowerShell では、2 は `Copy-Item -Recurse $HOME\.claude\skills\handdrawn-slides\template my-slides` です。
 
 ### 素材を名前で選ぶ
 
@@ -54,7 +54,8 @@ HTML には `<img src="assets/doodle-icons/Rocket.svg">` や `<img src="assets/o
 Chrome があれば、コマンドで1枚ずつ撮れます（右下の操作ヒントは先に消しておく）。
 
 ```bash
-chrome --headless=new --window-size=1600,900 --virtual-time-budget=6000   --screenshot=slide01.png "file:///.../my-slides/index.html#1"
+chrome --headless=new --window-size=1600,900 --virtual-time-budget=6000 \
+  --screenshot=slide01.png "file:///.../my-slides/index.html#1"
 ```
 
 ## 使い方（Claude Code から）
