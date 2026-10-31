@@ -6,15 +6,19 @@
 
 使い方:
   python scripts/fetch_assets.py <作業フォルダ>
-
-<作業フォルダ>の *.html が参照している assets/doodle-icons/<名前>.svg と
-assets/open-doodles/<名前>.svg だけを取得し、<作業フォルダ>/assets/ に置く。
+      <作業フォルダ>の *.html が参照している assets/doodle-icons/<名前>.svg と
+      assets/open-doodles/<名前>.svg だけを取得し、<作業フォルダ>/assets/ に置く。
+  python scripts/fetch_assets.py <作業フォルダ> --icon Bulb --icon Heart --doodle coffee
+      名前を指定して取得する（HTMLに書く前でも取れる）。
+  python scripts/fetch_assets.py --list-icons       Doodle Icons の名前一覧
+  python scripts/fetch_assets.py --list-doodles     Open Doodles の名前一覧
   --all-icons  Doodle Icons を全件（約440点）取得する
 
 標準ライブラリのみ。取得したパッケージ内のコードは実行しない（文字として読むだけ）。
 """
 import argparse
 import io
+import os
 import re
 import sys
 import tarfile
@@ -25,6 +29,10 @@ OPEN_DOODLES_URL = 'https://opendoodles.s3-us-west-1.amazonaws.com/%s.svg'
 # Doodle Icons の公式配布は Gumroad / Figma（メール入力や購入手続きが要る）。
 # ここでは、その絵を SVG のまま収めている npm パッケージから取り出す。
 DOODLE_ICONS_TGZ = 'https://registry.npmjs.org/doodle-icons/-/doodle-icons-1.1.0.tgz'
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
+    sys.stderr.reconfigure(encoding='utf-8')
+
 UA = {'User-Agent': 'Mozilla/5.0 (handdrawn-slides-skill fetch_assets.py)'}
 
 REF = re.compile(r'assets/(doodle-icons|open-doodles)/([A-Za-z0-9_-]+)\.svg')
@@ -84,12 +92,28 @@ def extract_doodle_icons(wanted):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument('folder', help='index.html のある作業フォルダ')
+    ap.add_argument('folder', nargs='?', help='index.html のある作業フォルダ')
+    ap.add_argument('--icon', action='append', default=[], metavar='NAME', help='Doodle Icons を名前で指定（複数可）')
+    ap.add_argument('--doodle', action='append', default=[], metavar='NAME', help='Open Doodles を名前で指定（複数可）')
+    ap.add_argument('--list-icons', action='store_true', help='Doodle Icons の名前一覧を表示')
+    ap.add_argument('--list-doodles', action='store_true', help='Open Doodles の名前一覧を表示')
     ap.add_argument('--all-icons', action='store_true', help='Doodle Icons を全件取得する')
     args = ap.parse_args()
 
+    if args.list_doodles:
+        page = get('https://www.opendoodles.com/').decode('utf-8', 'replace')
+        names = sorted(set(re.findall(r'amazonaws\.com/([^"/]+)\.svg', page)))
+        print('\n'.join(names))
+        return
+    if args.list_icons:
+        print('\n'.join(sorted(extract_doodle_icons(None))))
+        return
+    if not args.folder:
+        ap.error('作業フォルダを指定してください')
     folder = Path(args.folder)
     found = referenced(folder)
+    found['doodle-icons'].update(args.icon)
+    found['open-doodles'].update(args.doodle)
     out = folder / 'assets'
 
     names = sorted(found['open-doodles'])

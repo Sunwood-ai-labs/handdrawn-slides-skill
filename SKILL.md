@@ -10,7 +10,7 @@ description: 手書き風（ゆれた線・蛍光ペン・手書きフォント�
 1. **聞き手と行動を確定する**。「誰が見て、どう感じて、何をするか」が不明なら作る前に聞く。
 2. **各スライドの主張を1文にする**。見出しはラベルではなく結論の文にする。2つ言いたければ2枚に分ける。比較は変える要素を1つだけにする。
 3. `template/` を作業フォルダへフォルダごとコピーし、`index.html` の `<section class="slide">` を書き換える。CSS/JS（スケール・キー操作・印刷）はそのまま使う。
-4. **素材を取得する**: `python scripts/fetch_assets.py <作業フォルダ>`。`index.html` が参照する `assets/...svg` だけを、配布元から取得して `<作業フォルダ>/assets/` に置く。
+4. **素材を取得する**: `python scripts/fetch_assets.py <作業フォルダ>`（名前指定は `--icon Bulb --doodle coffee`、一覧は `--list-icons` / `--list-doodles`）。`index.html` が参照する `assets/...svg` だけを、配布元から取得して `<作業フォルダ>/assets/` に置く。
 5. ローカルサーバー（`python -m http.server`）経由でブラウザで全枚を開いて確認する（文字のはみ出し、枠の重なり、フォント、画像の読み込み）。
 
 ## 素材は含まれない
